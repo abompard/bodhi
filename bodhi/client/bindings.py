@@ -776,8 +776,15 @@ class BodhiClient(OpenIdBaseClient):
                 or update['date_submitted'].split()[0]
             days_in_status = _days_since(update['date_pushed']) if update['date_pushed'] \
                 else _days_since(update['date_submitted'])
-            val += (f"{security}{update['builds'][0]['nvr']:40} {update['content_type']:9}  "
-                    f"{update['status']:8}  {date:>10} ({days_in_status})")
+            title = update['title'] or update['alias']
+            content_type = update['content_type'] or 'unspecified'
+            try:
+                val += (f"{security}{title:40} {content_type:9}  "
+                        f"{update['status']:8}  {date:>10} ({days_in_status})")
+            except TypeError:
+                from pprint import pprint
+                pprint(update)
+                raise
             for build in update['builds'][1:]:
                 val += f"\n  {build['nvr']}"
             return val
